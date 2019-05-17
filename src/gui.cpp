@@ -9,6 +9,10 @@
 #include "gui.hpp"
 #include "config.hpp"
 
+#include <NetworkDisplay.h>
+#include "palette.inc"
+
+
 namespace GUI {
 
 // Screen size:
@@ -36,6 +40,8 @@ FileMenu* fileMenu;
 
 bool pause = true;
 
+
+
 /* Set the window size multiplier */
 void set_size(int mul)
 {
@@ -44,6 +50,43 @@ void set_size(int mul)
     SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
+NetworkDisplay *networkDisplay = NULL;
+static void InitNetworkDisplay(uint16_t screenWidth, uint16_t screenHeight) {
+
+
+  NetworkDisplayConfig displayConfig;
+
+  displayConfig.frameRate = -1; // Skip framerate
+
+  displayConfig.inputScreenWidth = screenWidth;
+  displayConfig.inputScreenHeight = screenHeight;
+
+  // 5 matrix strip. Each strip is FOUR matrices tall.
+  displayConfig.singlePanelWidth = 64;
+  displayConfig.singlePanelHeight = 64;
+
+  displayConfig.segmentPanelsTall = 3;
+  displayConfig.segmentPanelsWide = 1;
+
+  displayConfig.totalPanelsWide = 5;
+  displayConfig.totalPanelsTall = 3;
+
+  displayConfig.totalSegments = 5;
+
+  displayConfig.destinationPort = "9890";
+  displayConfig.destinationIP = "10.0.1.20%i";
+  displayConfig.destinationIpStartDigit = 1;
+
+  displayConfig.outputScreenWidth = displayConfig.singlePanelWidth * displayConfig.totalPanelsWide;
+  displayConfig.outputScreenHeight = displayConfig.singlePanelHeight * displayConfig.totalPanelsTall;
+
+
+  networkDisplay = new NetworkDisplay(displayConfig);
+
+
+
+
+}
 /* Initialize GUI */
 void init()
 {
@@ -59,27 +102,37 @@ void init()
     soundQueue = new Sound_Queue;
     soundQueue->init(96000);
 
-    // Initialize graphics structures:
-    window      = SDL_CreateWindow  ("LaiNES",
-                                     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                     WIDTH * last_window_size, HEIGHT * last_window_size, 0);
+    int flags =  SDL_WINDOW_OPENGL |  SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_RESIZABLE| SDL_WINDOW_SHOWN;
 
-    renderer    = SDL_CreateRenderer(window, -1,
+  // Initialize graphics structures:
+    window = SDL_CreateWindow("LaiNES",
+      SDL_WINDOWPOS_UNDEFINED,
+      SDL_WINDOWPOS_UNDEFINED,
+      WIDTH * 2, HEIGHT * 2, flags
+    );
+
+    renderer= SDL_CreateRenderer(window, -1,
                                      SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
     SDL_RenderSetLogicalSize(renderer, WIDTH, HEIGHT);
 
     gameTexture = SDL_CreateTexture (renderer,
                                      SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
                                      WIDTH, HEIGHT);
 
-    font = TTF_OpenFont("res/font.ttf", FONT_SZ);
+    font = TTF_OpenFont("../res/font.ttf", FONT_SZ);
     keys = SDL_GetKeyboardState(0);
 
     // Initial background:
-    SDL_Surface* backSurface  = IMG_Load("res/init.png");
+    SDL_Surface* backSurface  = IMG_Load("../res/init.png");
     background = SDL_CreateTextureFromSurface(renderer, backSurface);
     SDL_SetTextureColorMod(background, 60, 60, 60);
     SDL_FreeSurface(backSurface);
+
+
+
+    InitNetworkDisplay(WIDTH, HEIGHT);
+
 
     // Menus:
     mainMenu = new Menu;
@@ -116,8 +169,7 @@ void init()
         keyboardMenu[i]->add(new ControlEntry("Start",  &KEY_START[i]));
         keyboardMenu[i]->add(new ControlEntry("Select", &KEY_SELECT[i]));
 
-        if (joystick[i] != nullptr)
-        {
+        if (joystick[i] != nullptr) {
             joystickMenu[i] = new Menu;
             joystickMenu[i]->add(new Entry("<", []{ menu = settingsMenu; }));
             joystickMenu[i]->add(new Entry("< Keyboard", [=]{ menu = keyboardMenu[i]; useJoystick[i] = false; }));
@@ -135,6 +187,9 @@ void init()
     fileMenu = new FileMenu;
 
     menu = mainMenu;
+
+
+
 }
 
 /* Render a texture on screen */
@@ -202,26 +257,38 @@ u8 get_joypad_state(int n)
 }
 
 /* Send the rendered frame to the GUI */
-void new_frame(u32* pixels)
-{
-    SDL_UpdateTexture(gameTexture, NULL, pixels, WIDTH * sizeof(u32));
+void new_frame(u32* pixels) {
+
+  uint16_t *outputPixels = networkDisplay->GetInputBuffer();
+  u32 *inputPixels = pixels;
+
+  for (int i = 0; i < WIDTH * HEIGHT; i++) {
+    uint32_t aPixel = *inputPixels++;
+
+    uint8_t red = (aPixel >> 16) & 0xFF;
+    uint8_t green = (aPixel >> 8) & 0xFF;
+    uint8_t blue = (aPixel >> 0) & 0xFF;
+    *outputPixels++ =
+            ((uint16_t(red & 0b11111000) << 8)) | ((uint16_t(green & 0b11111100) << 3)) | (uint16_t(blue) >> 3);
+  }
+
+  networkDisplay->Update();
+
+  SDL_UpdateTexture(gameTexture, NULL, pixels, WIDTH * sizeof(u32));
 }
 
-void new_samples(const blip_sample_t* samples, size_t count)
-{
+void new_samples(const blip_sample_t* samples, size_t count) {
     soundQueue->write(samples, count);
 }
 
 /* Render the screen */
 void render()
 {
+
     SDL_RenderClear(renderer);
 
     // Draw the NES screen:
-    if (Cartridge::loaded())
-        SDL_RenderCopy(renderer, gameTexture, NULL, NULL);
-    else
-        SDL_RenderCopy(renderer, background, NULL, NULL);
+    SDL_RenderCopy(renderer, gameTexture, NULL, NULL);
 
     // Draw the menu:
     if (pause) menu->render();
@@ -272,6 +339,8 @@ int query_button()
     }
 }
 
+static const int FPS = 60;
+
 /* Run the emulator */
 void run()
 {
@@ -279,7 +348,6 @@ void run()
 
     // Framerate control:
     u32 frameStart, frameTime;
-    const int FPS   = 60;
     const int DELAY = 1000.0f / FPS;
 
     while (true)
@@ -302,9 +370,9 @@ void run()
         render();
 
         // Wait to mantain framerate:
-        frameTime = SDL_GetTicks() - frameStart;
-        if (frameTime < DELAY)
-            SDL_Delay((int)(DELAY - frameTime));
+//        frameTime = SDL_GetTicks() - frameStart;
+//        if (frameTime < DELAY)
+//            SDL_Delay((int)(DELAY - frameTime));
     }
 }
 
