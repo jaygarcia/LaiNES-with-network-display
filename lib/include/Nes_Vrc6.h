@@ -41,7 +41,7 @@ private:
 	
 	struct Vrc6_Osc
 	{
-		BOOST::uint8_t regs [3];
+		BLARG_BOOST::uint8_t regs [3];
 		Blip_Buffer* output;
 		int delay;
 		int last_amp;
@@ -67,13 +67,13 @@ private:
 
 struct vrc6_snapshot_t
 {
-	BOOST::uint8_t regs [3] [3];
-	BOOST::uint8_t saw_amp;
-	BOOST::uint16_t delays [3];
-	BOOST::uint8_t phases [3];
-	BOOST::uint8_t unused;
+	BLARG_BOOST::uint8_t regs [3] [3];
+	BLARG_BOOST::uint8_t saw_amp;
+	BLARG_BOOST::uint16_t delays [3];
+	BLARG_BOOST::uint8_t phases [3];
+	BLARG_BOOST::uint8_t unused;
 };
-BOOST_STATIC_ASSERT( sizeof (vrc6_snapshot_t) == 20 );
+BLARG_BOOST_STATIC_ASSERT( sizeof (vrc6_snapshot_t) == 20 );
 
 inline void Nes_Vrc6::osc_output( int i, Blip_Buffer* buf )
 {

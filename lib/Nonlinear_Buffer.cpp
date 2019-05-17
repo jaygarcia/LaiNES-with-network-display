@@ -106,7 +106,7 @@ long Nonlinear_Buffer::read_samples( blip_sample_t* out, long count )
 			nonlin.next( nonlin_bass );
 			*out++ = s;
 			
-			if ( (BOOST::int16_t) s != s )
+			if ( (BLARG_BOOST::int16_t) s != s )
 				out [-1] = 0x7FFF - (s >> 24);
 		}
 		
@@ -168,7 +168,7 @@ long Nes_Nonlinearizer::make_nonlinear( Blip_Buffer& buf, long count )
 		
 		#define ENTRY( s ) (table [((s) >> shift) & entry_mask])
 		
-		BOOST::uint16_t* p = buf.buffer_;
+		BLARG_BOOST::uint16_t* p = buf.buffer_;
 		unsigned prev = ENTRY( accum );
 		long accum = this->accum;
 		

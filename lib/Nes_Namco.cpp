@@ -50,7 +50,7 @@ void Nes_Namco::output( Blip_Buffer* buf )
 		osc_output( i, buf );
 }
 
-BOOST::uint8_t& Nes_Namco::access()
+BLARG_BOOST::uint8_t& Nes_Namco::access()
 {
 	int addr = addr_reg & 0x7f;
 	if ( addr_reg & 0x80 )
@@ -103,7 +103,7 @@ void Nes_Namco::run_until( cpu_time_t nes_end_time )
 		osc.delay = 0;
 		if ( time < end_time )
 		{
-			const BOOST::uint8_t* osc_reg = &reg [i * 8 + 0x40];
+			const BLARG_BOOST::uint8_t* osc_reg = &reg [i * 8 + 0x40];
 			if ( !(osc_reg [4] & 0xe0) )
 				continue;
 			

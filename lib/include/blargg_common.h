@@ -64,10 +64,10 @@
 	#define STATIC_CAST( type ) static_cast< type >
 #endif
 
-// Set up boost
-#include "boost/config.hpp"
-#ifndef BOOST_MINIMAL
-	#define BOOST boost
+// Set up blarg_boost
+#include "blarg_boost/boost_config.hpp"
+#ifndef BLARG_BOOST_MINIMAL
+	#define BLARG_BOOST blarg_boost
 	#ifndef BLARGG_COMPILER_HAS_NAMESPACE
 		#define BLARGG_COMPILER_HAS_NAMESPACE 1
 	#endif
@@ -95,11 +95,11 @@
 	#define BLARGG_USE_NAMESPACE BLARGG_COMPILER_HAS_NAMESPACE
 #endif
 
-#ifndef BOOST
+#ifndef BLARG_BOOST
 	#if BLARGG_USE_NAMESPACE
-		#define BOOST boost
+		#define BLARG_BOOST blarg_boost
 	#else
-		#define BOOST
+		#define BLARG_BOOST
 	#endif
 #endif
 
@@ -119,11 +119,11 @@
 	#define STD
 #endif
 
-// BOOST::uint8_t, BOOST::int16_t, etc.
-#include "boost/cstdint.hpp"
+// BLARG_BOOST::uint8_t, BLARG_BOOST::int16_t, etc.
+#include "blarg_boost/cstdint.hpp"
 
-// BOOST_STATIC_ASSERT( expr )
-#include "boost/static_assert.hpp"
+// BLARG_BOOST_STATIC_ASSERT( expr )
+#include "blarg_boost/static_assert.hpp"
 
 // Common standard headers
 #if BLARGG_COMPILER_HAS_NAMESPACE

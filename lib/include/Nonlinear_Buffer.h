@@ -28,7 +28,7 @@ private:
 	enum { shift = 5 };
 	enum { half = 0x8000 >> shift };
 	enum { entry_mask = half * 2 - 1 };
-	BOOST::uint16_t table [half * 2];
+	BLARG_BOOST::uint16_t table [half * 2];
 	long accum;
 	bool nonlinear;
 };

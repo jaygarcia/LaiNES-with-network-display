@@ -1,8 +1,8 @@
 
-// Boost substitute. For full boost library see http://boost.org
+// BLARG_BOOST substitute. For full blarg_boost library see http://blarg_boost.org
 
-#ifndef BOOST_CSTDINT_HPP
-#define BOOST_CSTDINT_HPP
+#ifndef BLARG_BOOST_CSTDINT_HPP
+#define BLARG_BOOST_CSTDINT_HPP
 
 #if BLARGG_USE_NAMESPACE
 	#include <climits>
@@ -10,7 +10,7 @@
 	#include <limits.h>
 #endif
 
-BLARGG_BEGIN_NAMESPACE( boost )
+BLARGG_BEGIN_NAMESPACE( blarg_boost )
 
 #if UCHAR_MAX != 0xFF || SCHAR_MAX != 0x7F
 #   error "No suitable 8-bit type available"
