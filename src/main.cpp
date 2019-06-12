@@ -7,7 +7,8 @@ int main(int argc, char *argv[])
 {
 //    GUI::load_settings();
     GUI::init();
-    Cartridge::load("../roms/tmnt2.nes");
+    Cartridge::load("../roms/Ninja Gaiden (U).nes");
+//    Cartridge::load("../roms/Galaga (U).nes");
     GUI::toggle_pause();
 
     GUI::run ();

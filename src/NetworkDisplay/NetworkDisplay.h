@@ -63,6 +63,14 @@ public:
 
 public:
 
+  size_t GetTotalInputPixels() {
+    return mInputBufferSize;
+  }
+
+  size_t GetTotalOutputPixels() {
+    return mOutputBufferSize;
+  }
+
   bool GetThreadRunnning() {
     return mThreadRunning;
   }
@@ -138,7 +146,7 @@ private:
   uint16_t *mInputBuffer2;
 
   size_t mOutputBufferSize;
-  uint16_t mTotalOutputPixels;
+  uint32_t mTotalOutputPixels;
   uint16_t *mCurrOutBuffer;
   uint16_t *mOutputBuffer1;
   uint16_t *mOutputBuffer2;

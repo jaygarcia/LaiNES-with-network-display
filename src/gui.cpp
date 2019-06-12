@@ -65,11 +65,11 @@ static void InitNetworkDisplay(uint16_t screenWidth, uint16_t screenHeight) {
   displayConfig.singlePanelWidth = 64;
   displayConfig.singlePanelHeight = 64;
 
-  displayConfig.segmentPanelsTall = 3;
+  displayConfig.segmentPanelsTall = 4;
   displayConfig.segmentPanelsWide = 1;
 
   displayConfig.totalPanelsWide = 5;
-  displayConfig.totalPanelsTall = 3;
+  displayConfig.totalPanelsTall = displayConfig.segmentPanelsTall;
 
   displayConfig.totalSegments = 5;
 
@@ -257,13 +257,18 @@ u8 get_joypad_state(int n)
 }
 
 /* Send the rendered frame to the GUI */
+uint32_t  nColor = 0;
 void new_frame(u32* pixels) {
-
+  nColor++;
   uint16_t *outputPixels = networkDisplay->GetInputBuffer();
+//  bzero(outputPixels, networkDisplay->GetTotalInputPixels());
+
   u32 *inputPixels = pixels;
 
   for (int i = 0; i < WIDTH * HEIGHT; i++) {
     uint32_t aPixel = *inputPixels++;
+
+//    aPixel = nColor;
 
     uint8_t red = (aPixel >> 16) & 0xFF;
     uint8_t green = (aPixel >> 8) & 0xFF;
@@ -370,9 +375,9 @@ void run()
         render();
 
         // Wait to mantain framerate:
-//        frameTime = SDL_GetTicks() - frameStart;
-//        if (frameTime < DELAY)
-//            SDL_Delay((int)(DELAY - frameTime));
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameTime < DELAY)
+            SDL_Delay((int)(DELAY - frameTime));
     }
 }
 
