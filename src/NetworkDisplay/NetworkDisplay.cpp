@@ -110,7 +110,6 @@ void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
       SegmentClient *segment = remoteDisplay->mSegments[segmentIdx];
 
       segment->LockMutex();
-//      bzero(segment->GetInputBuffer(), segment->mTotalBytes);
       uint16_t startX = segmentIdx * segment->mSegmentWidth;
 
       for (uint16_t y = 0; y < segment->mSegmentHeight; y++) {
@@ -131,7 +130,6 @@ void NetworkDisplay::ThreadFunction(NetworkDisplay *remoteDisplay) {
 
   printf("NetworkDisplay::ThreadFunction ended\n");
 }
-//uint3232_t  color = 0;
 void NetworkDisplay::Update() {
 //  SwapBuffers();
 //  printf("frame  %i\n", mFrameCount);

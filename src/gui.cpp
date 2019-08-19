@@ -74,7 +74,7 @@ static void InitNetworkDisplay(uint16_t screenWidth, uint16_t screenHeight) {
   displayConfig.totalSegments = 5;
 
   displayConfig.destinationPort = "9890";
-  displayConfig.destinationIP = "10.0.1.20%i";
+  displayConfig.destinationIP = "10.1.10.20%i";
   displayConfig.destinationIpStartDigit = 1;
 
   displayConfig.outputScreenWidth = displayConfig.singlePanelWidth * displayConfig.totalPanelsWide;
