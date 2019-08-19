@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(LaiNES)
+project(LaiNES-network-rgb-edition)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-exception-spec-mismatch")
@@ -36,13 +36,14 @@ set(LAINES_LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(SIMPLEINI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/simpleini)
 
 INCLUDE_DIRECTORIES(
-    ${SIMPLEINI_SOURCE_DIR}
-    ${LAINES_LIB_DIR}/include
-    ${LAINES_LIB_DIR}/include/boost
-    ${LAINES_SOURCE_DIR}/
-    ${LAINES_SOURCE_DIR}/include
-    ${LAINES_SOURCE_DIR}/include/mappers
-    ${LAINES_SOURCE_DIR}/NetworkDisplay
+  ${SIMPLEINI_SOURCE_DIR}
+  ${LAINES_LIB_DIR}/include
+  ${LAINES_LIB_DIR}/include/boost
+  ${LAINES_SOURCE_DIR}/
+  ${LAINES_SOURCE_DIR}/include
+  ${LAINES_SOURCE_DIR}/include/mappers
+  ${LAINES_SOURCE_DIR}/NetworkDisplay
+  ${CMAKE_SOURCE_DIR}/network-rgb-matrix-display/client/src
 )
 
 file(
@@ -52,6 +53,13 @@ file(
     ${LAINES_LIB_DIR}/*.cpp
     ${LAINES_SOURCE_DIR}/*.hpp
     ${LAINES_SOURCE_DIR}/*.cpp
+)
+
+
+file(
+  GLOB_RECURSE RGB_CLIENT_SOURCE_FILES
+  ${CMAKE_SOURCE_DIR}/network-rgb-matrix-display/client/src/*.h
+  ${CMAKE_SOURCE_DIR}/network-rgb-matrix-display/client/src/*.cpp
 )
 
 add_compile_definitions(__MODUS_TARGET_NETWORK_DISPLAY__=true)
@@ -64,7 +72,7 @@ add_custom_command(TARGET copy_data POST_BUILD
 
 
 
-add_executable(${PROJECT_NAME} ${LAINES_SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${LAINES_SOURCE_FILES} ${RGB_CLIENT_SOURCE_FILES})
 
 message(SDL2TTF_LIBRARIES " " ${SDL2TTF_LIBRARIES})
 
